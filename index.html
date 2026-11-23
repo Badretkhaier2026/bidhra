@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>اشتراكات بذرة خير</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap">
+<style>
+:root{
+  --bg:#f1f5f2; --surface:#ffffff; --fg:#16241d; --muted:#5a6b61; --line:#d5e0d9;
+  --accent:#1d6a49; --accent-fg:#ffffff; --accent-soft:#dcefe4; --warn:#a9501a; --warn-soft:#f8e6d9;
+  --font:'Cairo',system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0f1713; --surface:#16211b; --fg:#e5efe9; --muted:#93a79b; --line:#2a3a31;
+  --accent:#5fcf98; --accent-fg:#0b1a12; --accent-soft:#1c3a2a; --warn:#e8a06a; --warn-soft:#3a2819; color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px;line-height:1.55;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-size:1.5rem;line-height:1.3;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:2px 0 0;font-size:.95rem}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.btn{min-height:44px;padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn.small{min-height:36px;padding:4px 12px;font-size:.9rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.monthbar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.monthbar .label{font-size:1.25rem;font-weight:700;text-align:center;flex:1;min-width:0}
+.monthbar .btn{min-width:44px;padding-inline:12px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.stat b{display:block;font-size:1.35rem;font-variant-numeric:tabular-nums;line-height:1.3}
+.stat span{color:var(--muted);font-size:.88rem}
+.bar{height:10px;border-radius:5px;background:var(--accent-soft);overflow:hidden;margin-top:14px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.tools{display:flex;flex-direction:column;gap:10px}
+input[type=text],input[type=number],input[type=tel],input[type=date],input[type=email],input[type=password],textarea{
+  width:100%;min-height:44px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg)}
+textarea{min-height:120px;resize:vertical}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;min-height:40px;border:0;background:var(--surface);font-weight:600;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--accent-soft);color:var(--accent)}
+.list{display:flex;flex-direction:column;padding:0;margin:0;list-style:none}
+.member{border-top:1px solid var(--line);padding:10px 0}
+.member:first-child{border-top:0}
+.mhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mname{flex:1 1 140px;min-width:0;background:none;border:0;text-align:right;padding:6px 0;font-weight:600}
+.mname small{display:block;color:var(--muted);font-weight:400;font-size:.85rem;text-align:right}
+.two{display:flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden;flex:0 0 auto}
+.two button{min-height:40px;min-width:76px;padding:0 12px;border:0;background:transparent;font-weight:700;color:var(--muted)}
+.two button+button{border-inline-start:1.5px solid var(--line)}
+.two button.on-paid{background:var(--accent);color:var(--accent-fg)}
+.two button.on-unpaid{background:var(--warn-soft);color:var(--warn)}
+.two button[disabled]{cursor:default}
+.detail{margin-top:10px;padding:12px;border-radius:8px;background:var(--bg)}
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.chip{min-height:40px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-size:.9rem}
+.chip.paid{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:700}
+.chip[disabled]{cursor:default}
+.empty{text-align:center;color:var(--muted);padding:24px 8px}
+.note{padding:10px 12px;border-radius:8px;background:var(--warn-soft);color:var(--warn);font-size:.92rem}
+.role{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:.82rem;font-weight:600;margin-top:6px}
+.form{display:flex;flex-direction:column;gap:10px}
+.form label{font-weight:600;font-size:.92rem;display:flex;flex-direction:column;gap:4px}
+.toast{position:fixed;inset-inline:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none}
+.toast div{background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:8px;font-weight:600;max-width:90%}
+.danger{color:var(--warn);border-color:var(--warn)}
+.ltr{direction:ltr;text-align:left}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>اشتراكات جمعية بذرة خير</h1>
+      <p class="sub">سجل الاشتراكات الشهرية للأعضاء. أي تحديث يظهر للجميع مباشرة.</p>
+      <span class="role" id="role">عرض للأعضاء</span>
+    </div>
+    <button class="btn small" id="btnLogin">دخول الأمين / المراقب</button>
+    <button class="btn small" id="btnLogout" hidden>خروج</button>
+  </header>
+
+  <div id="banner" class="note" hidden></div>
+
+  <section class="card" id="panelLogin" hidden>
+    <form class="form" id="fLogin">
+      <label for="loginEmail">البريد الإلكتروني<input type="email" id="loginEmail" class="ltr" autocomplete="username" required></label>
+      <label for="loginPass">كلمة السر<input type="password" id="loginPass" class="ltr" autocomplete="current-password" required></label>
+      <div class="row"><button class="btn primary" type="submit">دخول</button><button class="btn" type="button" data-close="panelLogin">إلغاء</button></div>
+    </form>
+  </section>
+
+  <section class="card" aria-label="الشهر والمجاميع">
+    <div class="monthbar">
+      <button class="btn" id="prev" aria-label="الشهر السابق">→</button>
+      <div class="label" id="monthLabel"></div>
+      <button class="btn" id="next" aria-label="الشهر التالي">←</button>
+    </div>
+    <div class="stats">
+      <div class="stat" data-money hidden><b id="sCollected">0</b><span>المبلغ المحصّل</span></div>
+      <div class="stat" data-money hidden><b id="sExpected">0</b><span>المبلغ المنتظر</span></div>
+      <div class="stat"><b id="sPaid">0</b><span>عدد من دفعوا</span></div>
+      <div class="stat"><b id="sUnpaid">0</b><span>عدد من لم يدفعوا</span></div>
+    </div>
+    <div class="bar" role="progressbar" aria-label="نسبة من دفعوا" aria-valuemin="0" aria-valuemax="100"><i id="barFill"></i></div>
+  </section>
+
+  <section class="card tools" aria-label="أدوات">
+    <input type="text" id="search" placeholder="ابحث عن عضو بالاسم" aria-label="بحث">
+    <div class="seg" role="group" aria-label="تصفية">
+      <button type="button" data-f="all" aria-pressed="true">الكل</button>
+      <button type="button" data-f="unpaid" aria-pressed="false">لم يدفعوا</button>
+      <button type="button" data-f="paid" aria-pressed="false">دفعوا</button>
+    </div>
+    <div class="row">
+      <button class="btn primary small" id="btnAdd" hidden>+ عضو</button>
+      <button class="btn small" id="btnBulk" hidden>إضافة عدة أعضاء</button>
+      <button class="btn small" id="btnAmount" hidden>المبلغ الافتراضي</button>
+      <button class="btn small" id="btnSeed" hidden>استيراد قائمة الأعضاء الأولى</button>
+      <button class="btn small" id="btnCopy">نسخ قائمة المتأخرين</button>
+      <button class="btn small" id="btnCsv" hidden>تصدير Excel</button>
+    </div>
+  </section>
+
+  <section class="card" id="panelAmount" hidden>
+    <form class="form" id="fAmount">
+      <label for="amountInput">المبلغ الافتراضي للاشتراك الشهري (دج)، لمن لم يُحدَّد له مبلغ خاص
+        <input type="number" id="amountInput" min="0" step="50" inputmode="numeric" required>
+      </label>
+      <div class="row"><button class="btn primary" type="submit">حفظ</button><button class="btn" type="button" data-close="panelAmount">إلغاء</button></div>
+    </form>
+  </section>
+
+  <section class="card" id="panelAdd" hidden>
+    <form class="form" id="fAdd">
+      <label for="nameInput">اسم العضو<input type="text" id="nameInput" required autocomplete="off"></label>
+      <label for="amountNew">اشتراكه الشهري (دج)<input type="number" id="amountNew" min="0" step="50" inputmode="numeric"></label>
+      <label for="phoneInput">رقم الهاتف (اختياري)<input type="tel" id="phoneInput" inputmode="tel" autocomplete="off"></label>
+      <div class="row"><button class="btn primary" type="submit">إضافة</button><button class="btn" type="button" data-close="panelAdd">إلغاء</button></div>
+    </form>
+  </section>
+
+  <section class="card" id="panelBulk" hidden>
+    <form class="form" id="fBulk">
+      <label for="bulkInput">اسم في كل سطر، ثم فاصلة ثم المبلغ الشهري، ثم فاصلة والهاتف (اختياري)
+        <textarea id="bulkInput" placeholder="محمد بن علي, 1000, 0555123456&#10;فاطمة بوزيد, 2000"></textarea>
+      </label>
+      <div class="row"><button class="btn primary" type="submit">إضافة الكل</button><button class="btn" type="button" data-close="panelBulk">إلغاء</button></div>
+    </form>
+  </section>
+
+  <section class="card" id="panelText" hidden>
+    <div class="form"><label for="textOut">حدّد النص وانسخه<textarea id="textOut" readonly></textarea></label>
+    <div class="row"><button class="btn" type="button" data-close="panelText">إغلاق</button></div></div>
+  </section>
+
+  <section class="card" id="donCard" aria-label="تبرعات المحسنين" hidden>
+    <h2 style="font-size:1.1rem;margin:0 0 8px">تبرعات المحسنين</h2>
+    <div class="stat"><b id="donTotal">0</b><span>مجموع التبرعات الخارجية</span></div>
+    <form class="form" id="fDon" style="margin-top:14px" hidden>
+      <label for="donName">اسم المحسن (اتركه فارغًا إن لم يرد ذكر اسمه)<input type="text" id="donName" autocomplete="off"></label>
+      <label for="donAmount">المبلغ (دج)<input type="number" id="donAmount" min="1" step="50" inputmode="numeric" required></label>
+      <label for="donDate">التاريخ<input type="date" id="donDate"></label>
+      <label for="donNote">ملاحظة (اختياري)<input type="text" id="donNote" autocomplete="off"></label>
+      <div class="row"><button class="btn primary" type="submit">إضافة التبرع</button></div>
+    </form>
+    <ul class="list" id="donList" style="margin-top:8px"></ul>
+  </section>
+
+  <section class="card" aria-label="الأعضاء">
+    <ul class="list" id="list"></ul>
+  </section>
+</div>
+<div class="toast" aria-live="polite" id="toast"></div>
+
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,collection,doc,onSnapshot,query,where,setDoc,deleteDoc,addDoc,writeBatch} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig={
+  apiKey:"AIzaSyDB80_afP0smymrpbF5k2bo3oN2RPBXC18",
+  authDomain:"badrat-khaier.firebaseapp.com",
+  projectId:"badrat-khaier",
+  storageBucket:"badrat-khaier.firebasestorage.app",
+  messagingSenderId:"875370166326",
+  appId:"1:875370166326:web:f6a286da09dd8fc2aa0097"
+};
+// Display only. The real permissions are enforced by the Firestore rules.
+const TREASURER='rachidmesran@gmail.com', AUDITOR='you696@gmail.com';
+
+const app=initializeApp(firebaseConfig);
+const auth=getAuth(app);
+const db=getFirestore(app);
+
+const MONTHS=['جانفي','فيفري','مارس','أفريل','ماي','جوان','جويلية','أوت','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const SEED=[['زيان عدة',2000],['طيب حمادنة',2000],['يوسف بالطاهر',1000],['ناصري طيب',2000],['بن دلة عمر',1000],['مداحي محمد',1000],['بوقفة',1000],['جلجلي محمد',1000],['بلال سلطاني',1000],['ناصري هواري',3000],['ناصري نور الدين',500],['حبيب بن دومة',1000],['بو عبد الله بوخاتم',2000],['نورين عبد القادر',1000],['حسين لزرق',1000]];
+const now=new Date();
+const S={members:[],pay:{},ledger:{},plan:{},don:{},monthly:null,year:now.getFullYear(),month:now.getMonth(),q:'',filter:'all',open:null,confirmDel:null,confirmDon:null,membersReady:false,payReady:false,email:'',canWrite:false,isStaff:false};
+const $=id=>document.getElementById(id);
+let unsubYear=[],unsubStaff=[];
+
+const key=(y,m)=>y+'-'+String(m+1).padStart(2,'0');
+const money=n=>Number(n||0).toLocaleString('en-US')+' دج';
+function toast(t){const el=$('toast');el.textContent='';const d=document.createElement('div');d.textContent=t;el.appendChild(d);setTimeout(()=>d.remove(),2800)}
+function banner(t){const b=$('banner');if(t){b.textContent=t;b.hidden=false}else b.hidden=true}
+const isPaid=(id,k)=>!!S.pay[id+'_'+k];
+const amountOf=id=>{const p=S.plan[id];return p&&typeof p.amount==='number'?p.amount:S.monthly};
+
+function visible(){
+  const k=key(S.year,S.month),q=S.q.trim();
+  return S.members.filter(m=>{
+    if(q&&m.name.indexOf(q)<0)return false;
+    const p=isPaid(m.id,k);
+    if(S.filter==='paid')return p;
+    if(S.filter==='unpaid')return !p;
+    return true;
+  });
+}
+
+function renderDon(){
+  $('donCard').hidden=!S.isStaff;
+  if(!S.isStaff)return;
+  $('fDon').hidden=!S.canWrite;
+  const items=Object.keys(S.don).map(id=>{const x=S.don[id];return {id,name:String(x.name||''),amount:Number(x.amount)||0,date:String(x.date||''),note:String(x.note||'')}})
+    .sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
+  let tot=0;items.forEach(d=>tot+=d.amount);
+  $('donTotal').textContent=money(tot);
+  const ul=$('donList');ul.textContent='';
+  if(!items.length){const e=document.createElement('li');e.className='empty';e.textContent='لا توجد تبرعات مسجلة بعد.';ul.appendChild(e);return}
+  items.forEach(d=>{
+    const li=document.createElement('li');li.className='member';
+    const h=document.createElement('div');h.className='mhead';
+    const nm=document.createElement('div');nm.className='mname';nm.style.fontWeight='600';
+    nm.appendChild(document.createTextNode(d.name||'محسن (بدون اسم)'));
+    const sub=[d.date,d.note].filter(Boolean).join(' · ');
+    if(sub){const s=document.createElement('small');s.textContent=sub;nm.appendChild(s)}
+    const am=document.createElement('b');am.style.fontVariantNumeric='tabular-nums';am.textContent=money(d.amount);
+    h.appendChild(nm);h.appendChild(am);
+    if(S.canWrite){
+      const del=document.createElement('button');del.type='button';del.className='btn small danger';
+      del.textContent=S.confirmDon===d.id?'تأكيد الحذف':'حذف';
+      del.onclick=()=>{
+        if(S.confirmDon!==d.id){S.confirmDon=d.id;renderDon();return}
+        S.confirmDon=null;
+        deleteDoc(doc(db,'donations',d.id)).then(()=>toast('حُذف التبرع')).catch(()=>toast('تعذّر الحذف.'));
+      };
+      h.appendChild(del);
+    }
+    li.appendChild(h);ul.appendChild(li);
+  });
+}
+
+function render(){
+  renderDon();
+  const k=key(S.year,S.month),mon=S.isStaff;
+  $('monthLabel').textContent=MONTHS[S.month]+' '+S.year;
+  document.querySelectorAll('[data-money]').forEach(e=>e.hidden=!mon);
+  $('btnCsv').hidden=!mon;
+  $('btnAdd').hidden=!S.canWrite;$('btnBulk').hidden=!S.canWrite;$('btnAmount').hidden=!S.canWrite;
+  $('btnSeed').hidden=!(S.canWrite&&S.membersReady&&S.members.length===0);
+  const n=S.members.length;let paid=0;
+  S.members.forEach(m=>{if(isPaid(m.id,k))paid++});
+  $('sPaid').textContent=paid;$('sUnpaid').textContent=n-paid;
+  if(mon){
+    let collected=0;
+    S.members.forEach(m=>{const p=S.ledger[m.id+'_'+k];if(p)collected+=Number(p.amount)||0});
+    $('sCollected').textContent=money(collected);
+    let exp=0,miss=false;
+    S.members.forEach(m=>{const a=amountOf(m.id);if(a==null)miss=true;else exp+=a});
+    $('sExpected').textContent=(miss&&!exp)?'—':money(exp);
+  }
+  const pct=n?Math.round(paid/n*100):0;
+  $('barFill').style.width=pct+'%';
+  $('barFill').parentNode.setAttribute('aria-valuenow',pct);
+
+  const list=$('list');list.textContent='';
+  const rows=visible();
+  if(!rows.length){
+    const li=document.createElement('li');li.className='empty';
+    li.textContent=n?'لا يوجد أعضاء بهذا الشرط.':(S.membersReady?(S.canWrite?'لا يوجد أعضاء بعد. أضف عضوًا أو استورد القائمة الأولى.':'لم تُضف قائمة الأعضاء بعد.'):'جارٍ التحميل...');
+    list.appendChild(li);return;
+  }
+  rows.forEach(m=>{
+    const li=document.createElement('li');li.className='member';
+    const head=document.createElement('div');head.className='mhead';
+    const nm=document.createElement('button');nm.className='mname';nm.type='button';
+    nm.setAttribute('aria-expanded',S.open===m.id?'true':'false');
+    nm.appendChild(document.createTextNode(m.name));
+    const sub=[];
+    if(mon&&amountOf(m.id)!=null)sub.push(money(amountOf(m.id)));
+    if(S.canWrite&&m.phone)sub.push(m.phone);
+    if(sub.length){const s=document.createElement('small');s.textContent=sub.join(' · ');nm.appendChild(s)}
+    nm.onclick=()=>{S.open=S.open===m.id?null:m.id;S.confirmDel=null;render()};
+    const p=isPaid(m.id,k);
+    const two=document.createElement('div');two.className='two';two.setAttribute('role','group');two.setAttribute('aria-label','حالة الدفع لـ '+m.name);
+    const bp=document.createElement('button');bp.type='button';bp.textContent='دفع';
+    const bu=document.createElement('button');bu.type='button';bu.textContent='لم يدفع';
+    bp.className=p?'on-paid':'';bu.className=p?'':'on-unpaid';
+    bp.setAttribute('aria-pressed',p?'true':'false');bu.setAttribute('aria-pressed',p?'false':'true');
+    bp.disabled=!S.canWrite;bu.disabled=!S.canWrite;
+    bp.onclick=()=>{if(!p)setStatus(m,S.year,S.month,true)};
+    bu.onclick=()=>{if(p)setStatus(m,S.year,S.month,false)};
+    two.appendChild(bp);two.appendChild(bu);
+    head.appendChild(nm);head.appendChild(two);li.appendChild(head);
+    if(S.open===m.id){
+      const d=document.createElement('div');d.className='detail';
+      const t=document.createElement('p');t.style.margin='0 0 8px';t.style.fontWeight='600';
+      let cnt=0;for(let i=0;i<12;i++)if(isPaid(m.id,key(S.year,i)))cnt++;
+      t.textContent='سنة '+S.year+': دفع '+cnt+' من 12 شهرًا';
+      d.appendChild(t);
+      const g=document.createElement('div');g.className='months';
+      MONTHS.forEach((name,i)=>{
+        const c=document.createElement('button');c.type='button';
+        const pd=isPaid(m.id,key(S.year,i));
+        c.className='chip'+(pd?' paid':'');
+        c.textContent=(pd?'✓ ':'')+name;
+        c.disabled=!S.canWrite;
+        c.onclick=()=>setStatus(m,S.year,i,!pd);
+        g.appendChild(c);
+      });
+      d.appendChild(g);
+      if(S.canWrite){
+        const ar=document.createElement('div');ar.className='row';ar.style.marginTop='12px';
+        const ai=document.createElement('input');ai.type='number';ai.min='0';ai.step='50';ai.inputMode='numeric';
+        ai.id='amt_'+m.id;ai.setAttribute('aria-label','اشتراك '+m.name+' الشهري بالدينار');
+        ai.style.flex='1 1 120px';ai.style.width='auto';
+        if(amountOf(m.id)!=null)ai.value=amountOf(m.id);
+        const ab=document.createElement('button');ab.type='button';ab.className='btn small';ab.textContent='حفظ اشتراكه الشهري';
+        ab.onclick=()=>savePlan(m,ai.value);
+        ar.appendChild(ai);ar.appendChild(ab);d.appendChild(ar);
+        const r=document.createElement('div');r.className='row';r.style.marginTop='12px';
+        const del=document.createElement('button');del.type='button';del.className='btn small danger';
+        del.textContent=S.confirmDel===m.id?'تأكيد حذف العضو وسجله':'حذف العضو';
+        del.onclick=()=>{
+          if(S.confirmDel!==m.id){S.confirmDel=m.id;render();return}
+          removeMember(m);
+        };
+        r.appendChild(del);d.appendChild(r);
+      }
+      li.appendChild(d);
+    }
+    list.appendChild(li);
+  });
+}
+
+async function setStatus(m,y,mi,paid){
+  if(!S.canWrite)return;
+  const k=key(y,mi),id=m.id+'_'+k,amt=amountOf(m.id);
+  if(paid&&amt==null){openPanel('panelAmount');toast('حدد المبلغ الافتراضي أو مبلغ هذا العضو أولًا');return}
+  try{
+    const b=writeBatch(db);
+    if(paid){
+      b.set(doc(db,'ledger',id),{memberId:m.id,month:k,year:y,amount:amt,paidAt:new Date().toISOString()});
+      b.set(doc(db,'status',id),{memberId:m.id,month:k,year:y});
+    }else{
+      b.delete(doc(db,'status',id));
+      b.delete(doc(db,'ledger',id));
+    }
+    await b.commit();
+    toast(paid?'سُجّل دفع '+m.name:m.name+': لم يدفع');
+  }catch(e){toast('تعذّر الحفظ. حاول مرة أخرى.')}
+}
+async function savePlan(m,v){
+  const a=Number(v);
+  if(v===''||!(a>=0)){toast('اكتب مبلغًا صحيحًا');return}
+  try{await setDoc(doc(db,'plans',m.id),{amount:a});toast('حُفظ اشتراك '+m.name)}
+  catch(e){toast('تعذّر الحفظ.')}
+}
+async function removeMember(m){
+  try{
+    const b=writeBatch(db);
+    Object.keys(S.pay).filter(i=>S.pay[i].memberId===m.id).forEach(i=>{b.delete(doc(db,'status',i));b.delete(doc(db,'ledger',i))});
+    b.delete(doc(db,'plans',m.id));b.delete(doc(db,'members',m.id));
+    await b.commit();
+    S.open=null;S.confirmDel=null;toast('حُذف العضو');
+  }catch(e){toast('تعذّر الحذف.')}
+}
+
+function openPanel(id){
+  ['panelAmount','panelAdd','panelBulk','panelText','panelLogin'].forEach(p=>$(p).hidden=p!==id);
+  if(id==='panelAmount')$('amountInput').value=S.monthly==null?'':S.monthly;
+  const first=$(id).querySelector('input,textarea');if(first)setTimeout(()=>first.focus(),0);
+  $(id).scrollIntoView({block:'nearest'});
+}
+const closePanel=id=>{$(id).hidden=true};
+
+function clearSubs(list){list.forEach(f=>f());list.length=0}
+function subYear(){
+  clearSubs(unsubYear);
+  S.pay={};S.ledger={};S.payReady=false;
+  unsubYear.push(onSnapshot(query(collection(db,'status'),where('year','==',S.year)),snap=>{
+    const o={};snap.docs.forEach(d=>o[d.id]=d.data());
+    if(S.payReady&&!snap.metadata.hasPendingWrites&&!snap.metadata.fromCache){
+      snap.docChanges().forEach(c=>{
+        if(c.type!=='added')return;
+        const x=c.doc.data(),mem=S.members.filter(m=>m.id===x.memberId)[0];
+        const mi=Number(String(x.month||'').slice(5,7))-1;
+        if(mem&&MONTHS[mi])toast('تم تسجيل دفع اشتراك '+mem.name+' لشهر '+MONTHS[mi]);
+      });
+    }
+    if(!snap.metadata.fromCache)S.payReady=true;
+    S.pay=o;render();
+  },()=>banner('تعذّر تحميل حالة الدفع.')));
+  if(S.isStaff){
+    unsubYear.push(onSnapshot(query(collection(db,'ledger'),where('year','==',S.year)),snap=>{
+      const o={};snap.docs.forEach(d=>o[d.id]=d.data());S.ledger=o;render();
+    },()=>{}));
+  }
+}
+function subStaff(){
+  clearSubs(unsubStaff);
+  S.plan={};S.don={};S.monthly=null;
+  if(!S.isStaff)return;
+  unsubStaff.push(onSnapshot(collection(db,'plans'),snap=>{const o={};snap.docs.forEach(d=>o[d.id]=d.data());S.plan=o;render()},()=>{}));
+  unsubStaff.push(onSnapshot(collection(db,'donations'),snap=>{const o={};snap.docs.forEach(d=>o[d.id]=d.data());S.don=o;render()},()=>{}));
+  unsubStaff.push(onSnapshot(doc(db,'settings','main'),s=>{
+    const x=s.exists()?s.data():null;S.monthly=x&&typeof x.monthly==='number'?x.monthly:null;render();
+  },()=>{}));
+}
+
+const csvCell=v=>{v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+function exportCsv(){
+  const head=['الاسم','الهاتف'].concat(MONTHS).concat(['المجموع']);
+  const lines=[head.map(csvCell).join(',')];
+  S.members.forEach(m=>{
+    let tot=0;const cells=[m.name,m.phone||''];
+    for(let i=0;i<12;i++){const p=S.ledger[m.id+'_'+key(S.year,i)];const a=p?Number(p.amount)||0:'';tot+=a||0;cells.push(a)}
+    cells.push(tot);lines.push(cells.map(csvCell).join(','));
+  });
+  const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='subscriptions-'+S.year+'.csv';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+async function copyUnpaid(){
+  const k=key(S.year,S.month);
+  const names=S.members.filter(m=>!isPaid(m.id,k)).map(m=>m.name);
+  if(!names.length){toast('الجميع دفع هذا الشهر');return}
+  const txt='تذكير باشتراك شهر '+MONTHS[S.month]+' '+S.year+' لجمعية بذرة خير\nالأعضاء الذين لم يسدّدوا بعد:\n'+names.map((n,i)=>(i+1)+'. '+n).join('\n');
+  try{await navigator.clipboard.writeText(txt);toast('نُسخت القائمة')}
+  catch(e){$('textOut').value=txt;openPanel('panelText');$('textOut').select()}
+}
+
+$('prev').onclick=()=>{if(S.month===0){S.month=11;S.year--;subYear()}else S.month--;render()};
+$('next').onclick=()=>{if(S.month===11){S.month=0;S.year++;subYear()}else S.month++;render()};
+$('search').oninput=e=>{S.q=e.target.value;render()};
+document.querySelectorAll('.seg button').forEach(b=>{
+  b.onclick=()=>{S.filter=b.dataset.f;document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));render()};
+});
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closePanel(b.dataset.close));
+$('btnAdd').onclick=()=>openPanel('panelAdd');
+$('btnBulk').onclick=()=>openPanel('panelBulk');
+$('btnAmount').onclick=()=>openPanel('panelAmount');
+$('btnCopy').onclick=copyUnpaid;
+$('btnCsv').onclick=exportCsv;
+$('btnLogin').onclick=()=>openPanel('panelLogin');
+$('btnLogout').onclick=()=>signOut(auth);
+
+$('fLogin').onsubmit=async e=>{
+  e.preventDefault();
+  try{
+    await signInWithEmailAndPassword(auth,$('loginEmail').value.trim(),$('loginPass').value);
+    $('loginPass').value='';closePanel('panelLogin');toast('تم الدخول');
+  }catch(x){toast('البريد أو كلمة السر غير صحيحة.')}
+};
+$('fAmount').onsubmit=async e=>{
+  e.preventDefault();const v=Number($('amountInput').value);
+  if(!(v>=0))return;
+  try{await setDoc(doc(db,'settings','main'),{monthly:v});closePanel('panelAmount');toast('حُفظ المبلغ')}
+  catch(x){toast('تعذّر الحفظ.')}
+};
+$('donDate').value=new Date().toISOString().slice(0,10);
+$('fDon').onsubmit=async e=>{
+  e.preventDefault();
+  const a=Number($('donAmount').value);
+  if(!S.canWrite||!(a>0))return;
+  try{
+    await addDoc(collection(db,'donations'),{name:$('donName').value.trim(),amount:a,date:$('donDate').value||new Date().toISOString().slice(0,10),note:$('donNote').value.trim(),createdAt:new Date().toISOString()});
+    $('donName').value='';$('donAmount').value='';$('donNote').value='';toast('سُجّل التبرع');
+  }catch(x){toast('تعذّر الحفظ.')}
+};
+$('fAdd').onsubmit=async e=>{
+  e.preventDefault();const name=$('nameInput').value.trim(),phone=$('phoneInput').value.trim(),av=$('amountNew').value;
+  if(!name||!S.canWrite)return;
+  try{
+    const ref=await addDoc(collection(db,'members'),{name,phone,createdAt:new Date().toISOString()});
+    if(av!==''&&Number(av)>=0)await setDoc(doc(db,'plans',ref.id),{amount:Number(av)});
+    $('nameInput').value='';$('phoneInput').value='';$('amountNew').value='';$('nameInput').focus();toast('أُضيف '+name);
+  }catch(x){toast('تعذّرت الإضافة.')}
+};
+$('fBulk').onsubmit=async e=>{
+  e.preventDefault();if(!S.canWrite)return;
+  const lines=$('bulkInput').value.split('\n').map(l=>l.trim()).filter(Boolean);
+  const exist={};S.members.forEach(m=>exist[m.name]=1);
+  let added=0;
+  try{
+    for(const line of lines){
+      const parts=line.split(/[,،\t]/);const name=parts[0].trim(),av=(parts[1]||'').trim(),phone=(parts[2]||'').trim();
+      if(!name||exist[name])continue;exist[name]=1;
+      const ref=await addDoc(collection(db,'members'),{name,phone,createdAt:new Date().toISOString()});
+      if(av!==''&&Number(av)>=0)await setDoc(doc(db,'plans',ref.id),{amount:Number(av)});
+      added++;
+    }
+    $('bulkInput').value='';closePanel('panelBulk');toast('أُضيف '+added+' عضوًا');
+  }catch(x){toast('توقفت الإضافة بعد '+added+' عضوًا.')}
+};
+$('btnSeed').onclick=async()=>{
+  if(!S.canWrite||S.members.length)return;
+  try{
+    const b=writeBatch(db);
+    SEED.forEach((r,i)=>{
+      const id='m'+String(i+1).padStart(2,'0');
+      b.set(doc(db,'members',id),{name:r[0],phone:'',createdAt:new Date().toISOString()});
+      b.set(doc(db,'plans',id),{amount:r[1]});
+    });
+    b.set(doc(db,'settings','main'),{monthly:1000});
+    await b.commit();toast('تم استيراد 15 عضوًا');
+  }catch(x){toast('تعذّر الاستيراد.')}
+};
+
+onAuthStateChanged(auth,user=>{
+  const email=user&&user.email?user.email.toLowerCase():'';
+  S.email=email;
+  S.canWrite=email===TREASURER;
+  S.isStaff=email===TREASURER||email===AUDITOR;
+  $('btnLogin').hidden=!!user;$('btnLogout').hidden=!user;
+  $('role').textContent=email===TREASURER?'أمين الجمعية':email===AUDITOR?'مراقب الجمعية':'عرض للأعضاء';
+  subStaff();subYear();render();
+});
+
+// members: public list
+const timer=setTimeout(()=>{if(!S.membersReady)banner('تعذّر الوصول إلى البيانات حتى الآن. تأكد من الاتصال بالإنترنت.')},10000);
+onSnapshot(collection(db,'members'),snap=>{
+  S.members=snap.docs.map(d=>{const x=d.data();return {id:d.id,name:String(x.name||''),phone:String(x.phone||'')}})
+    .sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+  if(!snap.metadata.fromCache){S.membersReady=true;clearTimeout(timer);banner('')}
+  render();
+},()=>banner('تعذّر تحميل الأعضاء.'));
+render();
+</script>
+</body>
+</html>
